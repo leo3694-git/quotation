@@ -442,7 +442,7 @@
                 const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
                 const day = String(tomorrow.getDate()).padStart(2, '0');
                 
-                const fileName = `${year}-${month}-${day}-報價單資料`;
+                const fileName = `${year}-${month}-${day}`;
 
                 // 呼叫下載函式，並傳入新的檔案名稱
                 downloadObjectAsJson(finalData, fileName);
@@ -474,3 +474,4 @@
   const app = initializeApp(firebaseConfig);
 </script>
 </html>
+
