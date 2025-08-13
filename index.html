@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報價單資料輸入介面</title>
+    <style>
+        /* General Styles */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1 { 
+            text-align: center; 
+            color: #1a237e; 
+            margin-bottom: 30px;
+        }
+
+        /* Form Container and Sections */
+        .form-container { 
+            max-width: 1200px; 
+            margin: auto; 
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+            min-width: 80px;
+            display: block;
+            align-self: center;
+        }
+        .form-group input {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        
+        /* Item List Sections */
+        .item-list { 
+            border: 1px solid #e0e0e0; 
+            padding: 20px; 
+            margin-bottom: 30px; 
+            border-radius: 8px; 
+            background-color: #fafafa;
+        }
+        .item-list h3 { 
+            margin-top: 0; 
+            color: #3f51b5;
+            border-bottom: 2px solid #3f51b5;
+            padding-bottom: 5px;
+        }
+        
+        /* Item Rows */
+        .item-row { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 10px; /* 縮短與備註欄位的間距 */
+            gap: 10px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        .item-row span.item-index { 
+            font-weight: bold; 
+            color: #616161; 
+            min-width: 30px; 
+            text-align: center;
+        }
+        .item-row input, .item-row select { 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 針對部品輸入框進行調整 - 更長 */
+        .item-row .input-part {
+            flex-grow: 2;
+            min-width: 150px;
+        }
+
+        /* 針對金型輸入框進行調整 */
+        .item-row .input-mold {
+            max-width: 150px;
+            flex-grow: 0.5;
+            min-width: 80px;
+        }
+        
+        /* 針對穴數輸入框和下拉選單進行調整 */
+        .cavity-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-grow: 0.5;
+            min-width: 150px;
+        }
+        .cavity-group .input-cavity-count {
+            width: 60px;
+            flex-grow: 0;
+            min-width: unset;
+        }
+        .cavity-group .input-cavity-unit {
+            flex-grow: 1;
+            min-width: 80px;
+        }
+
+        .item-row .input-guarantee {
+              flex-grow: 1;
+              min-width: 80px;
+        }
+
+        .item-row .input-amount {
+            flex-grow: 1;
+            min-width: 80px;
+        }
+
+        .item-row .unit-text {
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1a237e;
+            font-weight: bold;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        /* 新增備註欄位樣式 */
+        .note-field {
+            width: 100%;
+            margin-top: 10px;
+            padding: 0 10px;
+            box-sizing: border-box; /* 確保內邊距不影響寬度 */
+        }
+        .note-field textarea {
+            width: 100%;
+            min-height: 80px; /* 預設高度 */
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            box-sizing: border-box;
+            resize: vertical; /* 允許垂直拖拉調整大小 */
+        }
+        .note-field label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Buttons */
+        .remove-btn { 
+            background-color: #ef5350; 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .remove-btn:hover { background-color: #e53935; }
+        .item-list-actions { text-align: right; margin-top: 10px; }
+        .add-btn { 
+            background-color: #4CAF50; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            border-radius: 4px; 
+            transition: background-color 0.3s;
+        }
+        .add-btn:hover { background-color: #43a047; }
+        
+        /* Output and Submit Button */
+        .summary { 
+            margin-top: 20px; 
+            padding: 15px; 
+            border: 1px solid #e0e0e0; 
+            background-color: #e8eaf6; 
+            border-radius: 4px;
+            text-align: right;
+        }
+        .summary h3 { 
+            margin: 0; 
+            color: #1a237e; 
+            border-bottom: none;
+        }
+        #total-amount { font-size: 20px; font-weight: bold; color: #d32f2f; }
+
+        .hidden-output { 
+            margin-top: 30px; 
+            text-align: center;
+        }
+        #submitBtn { 
+            background-color: #00796b; 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #submitBtn:hover { background-color: #00695c; }
+        pre { 
+            background-color: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            border: 1px solid #e0e0e0; 
+            text-align: left; 
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-group { flex-direction: column; }
+            .form-group input, .item-row input, .item-row select { width: 100%; min-width: unset; }
+            .item-row { flex-wrap: wrap; }
+            .item-row .remove-btn { margin-left: auto; }
+            .item-row span.item-index { min-width: 20px; }
+            
+            .cavity-group { flex-wrap: nowrap; min-width: unset; width: 100%; }
+            .cavity-group .input-cavity-count { width: 60px; }
+            .cavity-group .input-cavity-unit { width: 100px; }
+            .note-field { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>報價單資料輸入</h1>
+
+        <div class="form-group">
+            <label for="customer">客戶名稱:</label>
+            <input type="text" id="customer" name="customer" placeholder="請輸入客戶名稱">
+            <label for="customerProductName">客戶要求品名:</label>
+            <input type="text" id="customerProductName" name="customerProductName" placeholder="請輸入客戶要求品名">
+        </div>
+
+        <div class="item-list">
+            <h3>商品明細</h3>
+            <div id="product-list-container"></div>
+            <div class="item-list-actions">
+                <button type="button" class="add-btn" onclick="createItemRow('product-list-container', true)">+ 新增商品</button>
+            </div>
+            <div class="summary">
+                <h3>總金額: <span id="total-amount">0.00</span></h3>
+            </div>
+        </div>
+        
+        <div class="item-list">
+            <h3>製品</h3>
+            <div id="component-list-container"></div>
+            <div class="item-list-actions">
+                <button type="button" class="add-btn" onclick="createItemRow('component-list-container', false)">+ 新增製品</button>
+            </div>
+        </div>
+
+        <div class="hidden-output">
+            <button type="button" id="submitBtn">下載 JSON 資料</button>
+            <pre><code id="jsonDataOutput"></code></pre>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const productListContainer = document.getElementById('product-list-container');
+            const componentListContainer = document.getElementById('component-list-container');
+            const totalAmountSpan = document.getElementById('total-amount');
+            const submitBtn = document.getElementById('submitBtn');
+            const jsonDataOutput = document.getElementById('jsonDataOutput');
+
+            window.createItemRow = function(containerId, isProduct = true) {
+                const container = document.getElementById(containerId);
+                const itemIndex = container.children.length + 1;
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'item-wrapper';
+
+                let itemRowHtml = `<div class="item-row">`;
+                itemRowHtml += `<span class="item-index">${itemIndex})</span>`;
+                
+                if (isProduct) {
+                    itemRowHtml += `
+                        <input type="text" class="input-part" placeholder="部品" required>
+                        <input type="text" class="input-mold" placeholder="金型" required>
+                        <div class="cavity-group">
+                            <input type="number" class="input-cavity-count" placeholder="穴數" required min="1">
+                            <select class="input-cavity-unit">
+                                <option value="SET">SET</option>
+                                <option value="ヶ取り">ヶ取り</option>
+                            </select>
+                        </div>
+                        <input type="number" class="input-guarantee" placeholder="保證次數" required min="1">
+                        <input type="number" class="input-amount" placeholder="金額" required min="0" step="0.01">
+                        <button type="button" class="remove-btn">x</button>
+                    `;
+                } else {
+                    itemRowHtml += `
+                        <input type="text" class="input-name" placeholder="品名" required>
+                        <input type="number" class="input-min-order" placeholder="最低下單數" required min="1">
+                        <div class="unit-text">pcs/lot</div>
+                        <input type="number" class="input-price" placeholder="單價@USD" required min="0" step="0.001">
+                        <button type="button" class="remove-btn">x</button>
+                    `;
+                }
+                itemRowHtml += `</div>`;
+
+                // 備註欄位獨立出來
+                const noteFieldHtml = `
+                    <div class="note-field">
+                        <label>備註:</label>
+                        <textarea class="input-note" placeholder="在此輸入備註"></textarea>
+                    </div>
+                `;
+                
+                itemWrapper.innerHTML = itemRowHtml + (isProduct ? '' : noteFieldHtml);
+
+                const removeBtn = itemWrapper.querySelector('.remove-btn');
+                removeBtn.addEventListener('click', function() {
+                    if (container.children.length > 1) {
+                        itemWrapper.remove();
+                        updateIndexesAndTotal();
+                    } else {
+                        alert('至少要有一列');
+                    }
+                });
+
+                if (isProduct) {
+                    const amountInput = itemWrapper.querySelector('.input-amount');
+                    amountInput.addEventListener('input', updateTotalAmount);
+                }
+
+                container.appendChild(itemWrapper);
+                updateIndexesAndTotal();
+            };
+
+            function updateTotalAmount() {
+                let total = 0;
+                const amountInputs = document.querySelectorAll('#product-list-container .input-amount');
+                amountInputs.forEach(input => {
+                    const value = parseFloat(input.value) || 0;
+                    total += value;
+                });
+                totalAmountSpan.textContent = total.toFixed(2);
+            }
+
+            function updateIndexesAndTotal() {
+                const productWrappers = document.querySelectorAll('#product-list-container .item-wrapper');
+                productWrappers.forEach((wrapper, index) => {
+                    wrapper.querySelector('.item-index').textContent = `${index + 1})`;
+                });
+                const componentWrappers = document.querySelectorAll('#component-list-container .item-wrapper');
+                componentWrappers.forEach((wrapper, index) => {
+                    wrapper.querySelector('.item-index').textContent = `${index + 1})`;
+                });
+                updateTotalAmount();
+            }
+
+            function formatToUSD(number) {
+                if (typeof number !== 'number' || isNaN(number)) {
+                    return '';
+                }
+                return number.toFixed(2);
+            }
+
+            // 這是一個將 JavaScript 物件轉換為 JSON 檔案並觸發下載的函式
+            function downloadObjectAsJson(exportObj, exportName){
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", exportName + ".json");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }
+
+            submitBtn.addEventListener('click', function() {
+                const products = [];
+                const productWrappers = document.querySelectorAll('#product-list-container .item-wrapper');
+                productWrappers.forEach((wrapper, index) => {
+                    products.push({
+                        id: `${index + 1})`,
+                        part: wrapper.querySelector('.input-part').value,
+                        mold: wrapper.querySelector('.input-mold').value,
+                        cavity: {
+                            count: parseInt(wrapper.querySelector('.input-cavity-count').value),
+                            unit: wrapper.querySelector('.input-cavity-unit').value
+                        },
+                        guarantee: parseInt(wrapper.querySelector('.input-guarantee').value),
+                        amount: formatToUSD(parseFloat(wrapper.querySelector('.input-amount').value))
+                    });
+                });
+                
+                const components = [];
+                const componentWrappers = document.querySelectorAll('#component-list-container .item-wrapper');
+                componentWrappers.forEach((wrapper, index) => {
+                    components.push({
+                        id: `${index + 1})`,
+                        name: wrapper.querySelector('.input-name').value,
+                        minOrder: parseInt(wrapper.querySelector('.input-min-order').value),
+                        unit: 'pcs/lot',
+                        price: parseFloat(wrapper.querySelector('.input-price').value),
+                        note: wrapper.querySelector('.input-note').value
+                    });
+                });
+
+                const finalData = {
+                    customer: document.getElementById('customer').value,
+                    customerProductName: document.getElementById('customerProductName').value,
+                    products: products,
+                    components: components,
+                    totalAmount: formatToUSD(parseFloat(totalAmountSpan.textContent))
+                };
+
+                // 呼叫下載函式來下載JSON檔案
+                downloadObjectAsJson(finalData, '報價單資料');
+            });
+
+            // 初始時，建立一個商品和一個製品的輸入列
+            createItemRow('product-list-container', true);
+            createItemRow('component-list-container', false);
+        });
+    </script>
+</body>
+</html>
